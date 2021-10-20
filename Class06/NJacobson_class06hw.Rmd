@@ -1,0 +1,179 @@
+---
+title: "functionsintro"
+author: "Nicole Jacobson A13081206"
+Date: 211015
+output: pdf_document
+html_document: null
+---
+
+## R markdown intro
+
+# **Intro to  functions**
+
+```{r}
+rescale <- function(x) {
+  rng <- range(x) 
+(x-rng[1])/(rng[2]-rng[1])
+}
+
+rescale
+rescale(1:10)
+
+rescale(c(1,4,10,20))
+```
+
+
+> Q1. Write a function grade() to determine an overall grade from a vector of student homework
+assignment scores dropping the lowest single score. If a student misses a homework (i.e. has an
+NA value) this can be used as a score to be potentially dropped. Your final function should be
+adquately explained with code comments and be able to work on an example class gradebook
+such as this one in CSV format: “https://tinyurl.com/gradeinput” [3pts]
+
+```{r}
+# Example input vectors to start with
+student1 <- c(100, 100, 100, 100, 100, 100, 100, 90)
+student2 <- c(100, NA, 90, 90, 90, 90, 97, 80)
+student3 <- c(90, NA, NA, NA, NA, NA, NA, NA)
+```
+
+
+
+```{r}
+# tells us the position at which the minimum value is found
+which.min(student1)
+```
+
+```{r}
+# - in the front will do everything but that is listed
+# add mean at the front to get the mean of those values
+mean(student1[ - which.min(student1)])
+
+
+```
+
+
+```{r}
+# Gives us the position where we find an NA
+which(is.na(student2)) 
+
+```
+
+```{r}
+# Let's replace the NAs with zeros.using the [] we are making the positions with an NA 0
+student.prime <- student3
+student.prime[is.na(student.prime)] = 0
+student.prime
+
+
+```
+
+
+```{r}
+#put pieces together to get the final function
+mean(student.prime[ - which.min(student.prime)])
+
+```
+
+
+```{r}
+# now we can make our function. We will take out working piece and make it a function (code -> extract function)
+grade <- function(student.prime) {
+  student.prime[is.na(student.prime)] = 0
+  mean(student.prime[ - which.min(student.prime)])
+}
+```
+
+
+```{r}
+grade(student1)
+grade(student2)
+grade(student3)
+```
+
+```{r}
+#' Calculate the average score for a class of scores excluding the lowest score. Missing values are treated as zero scores
+#'
+#' @param student.prime numeric vector of homework scores
+#'
+#' @return average score
+#' @export 
+#'
+#' @examples student <- c(100, NA, 90, 80)
+#' grade(student)
+grade <- function(student.prime) {
+  # made the NA values equal to zero
+  student.prime[is.na(student.prime)] = 0
+  # made to exclude the lowest value
+  mean(student.prime[ - which.min(student.prime)])
+}
+
+
+
+```
+
+
+
+```{r}
+# now we can take the grade book and grade the class (example class grade book found here https://tinyurl.com/gradeinput
+
+url <- "https://tinyurl.com/gradeinput"
+gradebook <- read.csv(url, row.names=1)
+gradebook
+```
+
+```{r}
+# apply(x, margin, fun, ...) x is the dataset, margin 1 indicates rows 2 indicates columns or both c(1,2), fun is the functiom
+apply(gradebook, 1, grade)
+
+```
+
+```{r}
+# who is the top scoring student?
+results <- apply(gradebook, 1, grade)
+sort (results, decreasing = TRUE)
+```
+
+```{r}
+# another option
+which.max(results)
+```
+
+```{r}
+# was was the toughest assignment? Which column has the lowest score? Two options.
+hw.mean <- apply(gradebook, 2, mean, na.rm = TRUE)
+which.min(hw.mean)
+
+hw.median <- apply(gradebook, 2, median, na.rm = TRUE)
+which.min(hw.median)
+
+```
+
+```{r}
+boxplot(gradebook)
+```
+
+```{r}
+grade2 <- function(student.prime, drop.lowest=TRUE) 
+  {student.prime <- as.numeric(student.prime)
+student.prime[is.na(student.prime)] = 0 
+if(drop.lowest) 
+{mean(student.prime[ -which.min(student.prime)])
+} else {
+    mean(student.prime)}
+}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
