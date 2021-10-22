@@ -1,0 +1,22 @@
+---
+title: "class8"
+output: html_document
+name: Nicole Jacobson
+
+---
+
+```{r}
+url <- "https://tinyurl.com/UK-foods"
+x <- read.csv(url)
+nrow(x)
+ncol(x)
+head(x)
+```
+
+```{r}
+rownames(x) <- x[,1]
+x <- x[,-1]
+head(x)
+
+```
+
