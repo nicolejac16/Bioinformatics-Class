@@ -6,17 +6,108 @@ name: Nicole Jacobson
 ---
 
 ```{r}
+#read in the UK foods data
 url <- "https://tinyurl.com/UK-foods"
 x <- read.csv(url)
 nrow(x)
 ncol(x)
+#we can see that the food row is supposed to be a column
 head(x)
 ```
 
 ```{r}
+#this is a destructive way to do this.
 rownames(x) <- x[,1]
 x <- x[,-1]
+x
+
+
+```
+
+
+```{r}
+# this will note override your data as you go.
+x <- read.csv(url, row.names=1)
 head(x)
 
 ```
+
+# Q2. Which approach to solving the ‘row-names problem’ mentioned above do you prefer and why? Is one approach more robust than another under certain circumstances?
+
+  The second method is easier because it stores the command all in one variable. The first method changes every time you run the script, therefore deleting the first row every time leaving you with no data. 
+
+```{r}
+# x is not a matrix so we have to force it to be a matrix (as.matrix(x))
+barplot(as.matrix(x), beside=T, col=rainbow(17))
+```
+
+
+
+# Q3. Changing the beside argument to false in barplot() will give the following plot;
+
+```{r}
+
+barplot(as.matrix(x), beside=F, col=rainbow(nrow(x)))
+```
+
+# Q5. Generating all pairwise plots may help somewhat. Can you make sense of the following code and resulting figure? What does it mean if a given point lies on the diagonal for a given plot?
+
+
+
+```{r}
+# pairs is an all pairwise plot. 
+# points that fall on the diagonal means the two countries are equal
+# this can give you the fold change from one treatment to another
+mycols <- rainbow(nrow(x))
+pairs(x, col=mycols) 
+
+```
+
+# Q6. What is the main differences between N. Ireland and the other countries of the UK in terms of this data-set?
+
+## PCA to the resue to reduce complication in the data
+
+  Here we will use the base R function for PCA, which is called 'prcomp()'. This function wants the transpose of our data.
+
+```{r}
+# it wants the countries in the rows and data in columns. 
+# t is used to transpose the data
+# we are looking to maximize the proportion of variance the PCs describe. PC1 is decribing over 67% of the variance, and 29% on PC2
+pca <-prcomp(t(x))
+summary(pca)
+```
+
+Now we will make a score/pca plot (pc1 vs pc2)
+
+```{r}
+# now we want to make a plot of PC1 vs PC2
+# attributes tells us what makes up the pca 
+attributes(pca)
+```
+
+
+This is showing us that N. Ireland is eating very different things than Scotland, England, and Wales as explained by PC1.
+
+```{r}
+# We are after the pca$x component for this plot
+# we are using base r plots for now to quickly visualize the data
+plot(pca$x[,1:2])
+text(pca$x[,1:2], labels = colnames(x), col=c("red","blue","orange","green"))
+
+
+```
+
+
+We can now examine PC1 in depth since it explains the highest percent of the variance
+
+  In N. Ierland they eat way more potatoes and way less fresh fruit.
+
+```{r}
+# Let's focus on PC1 as it accounts for > 90% of variance 
+par(mar=c(10, 3, 0.35, 0))
+barplot( pca$rotation[,1], las=2 )
+
+```
+
+
 
