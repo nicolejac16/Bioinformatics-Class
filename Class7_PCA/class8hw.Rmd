@@ -109,5 +109,42 @@ barplot( pca$rotation[,1], las=2 )
 
 ```
 
+```{r}
+# there are 5 wt and 5 knockout
+url2 <- "https://tinyurl.com/expression-CSV"
+rna.data <- read.csv(url2, row.names=1)
+head(rna.data)
+```
+
+```{r}
+nrow(rna.data)
+ncol(rna.data)
+colnames(rna.data)
+```
+
+```{r}
+pca.rna <- prcomp(t(rna.data), scale = TRUE)
+summary(pca.rna)
+
+```
+
+```{r}
+plot(pca.rna$x[,1:2])
+text(pca.rna$x[,1:2], labels = colnames(rna.data))
+```
+
+Now we see two groups split along PC1. The WT and KO are separated. We sometimes use this as a quality control to see if your experimental points fall close together. 
+
+
+
+
+
+
+
+
+
+
+
+
 
 
