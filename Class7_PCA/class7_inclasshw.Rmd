@@ -1,0 +1,11 @@
+---
+title: "Class7lab"
+output: html_document
+name: Nicole Jacobson
+---
+
+```{r}
+
+
+```
+
