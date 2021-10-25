@@ -1,9 +1,104 @@
 ---
 title: "class8"
-output: html_document
-name: Nicole Jacobson
-
+output:
+  pdf_document: default
+  html_document: default
+name: Nicole Jacobson A13081206
 ---
+
+
+## Clustering Methods
+
+Kmeans clustering in R  is done with 'kmeans()' function. You tell it how many clusters you want beforehand
+
+
+```{r}
+#here we are making up some data to learn and test with
+# give rnorm n number of points you want, mean, and sd. It will output a random data set
+# cbind takes a vector and binds it to another column next to it
+# rbind will do the same but add another row
+# now the data is clustered into two
+
+tmp <- c(rnorm(30, 3), rnorm(30,-3))
+data <- cbind(x=tmp, y=rev(tmp))
+plot(data)
+```
+
+```{r}
+#now we will run kmeans. Set k to 2 and nstart to 20. You have to tell it how many clusters you want
+#clustering vector is telling you which cluster each element of data is in
+km <- kmeans(data, centers = 2, nstart = 20)
+km
+```
+
+
+```{r}
+# Q. How many points are in each cluster?
+km$size
+```
+
+```{r}
+# Q What component of your result object details cluster assignment/membership?
+km$cluster
+
+```
+
+
+```{r}
+# Q What component of your result object details cluster center?
+km$center
+
+```
+
+
+```{r}
+# Q What component of your result object details cluster assignment and add cluster centers as blue points
+
+plot(data, col=km$cluster)
+points(km$centers, col="blue", pch=15, cex=2)
+
+
+```
+
+## Hierarchical Clustering
+
+```{r}
+#we will use the 'hclust()' function on the same data as above
+# can can't just feed in the previous data set. We need to give it a measure of how similar each point is to each other (dist)
+hc <- hclust(dist(data))
+hc
+
+```
+
+```{r}
+#hclust has a plot method. Here it produced a cluster dendrogram. The numbers at the bottom are what the row names are. The first group is 1-30 and the second is 31-60. The two groups are far away from each other. Now we will cut the tree so we can get the two groups seperated.
+plot(hc)
+abline(h=8, col="red")
+
+```
+
+```{r}
+# to find our membership vector, we need to 'cut' the tree and for this we use the term 'cutree()' function. We input the height (h) where we want to cut based on the graph above.
+cutree(hc,h=8)
+
+
+```
+
+```{r}
+# can also cut the tree so you have a distinct number of branches
+grps <- cutree(hc,k=2)
+```
+
+```{r}
+plot(data, col=grps)
+```
+
+kmeans(x,centers=?)
+hclust(dist(x))
+
+
+## Principal Component Analysis (PCA)
+
 
 ```{r}
 #read in the UK foods data
