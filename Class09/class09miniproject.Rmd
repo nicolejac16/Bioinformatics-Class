@@ -236,13 +236,7 @@ table(wisc.pca.hclust.clusters, diagnosis)
 
 ```
 
-# Q16. How well do the k-means and hierarchical clustering models you created in previous sections (i.e. before PCA) do in terms of separating the diagnoses? Again, use the table() function to compare the output of each model (wisc.km$cluster and wisc.hclust.clusters) with the vector containing the actual diagnoses.
 
-```{r}
-table(___, diagnosis)
-table(___, diagnosis)
-
-```
 
 
 
