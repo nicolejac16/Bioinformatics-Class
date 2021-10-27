@@ -6,7 +6,7 @@ output: pdf_document
 ---
 
 
-## Class 09 Miniproject
+## Class 09 Miniproject, Analysis of Human Breast Cancer Cells
 
 ```{r}
 
@@ -14,6 +14,194 @@ output: pdf_document
 fna.data <- "WisconsinCancer.csv"
 
 # Complete the following code to input the data and store as wisc.df
-wisc.df <- ____(fna.data, row.names=1)
+wisc.df <- read.csv(fna.data, row.names=1)
+head(wisc.df)
 ```
+
+```{r}
+# We can use -1 here to remove the first column since we don't want to include the expert diagnosis
+
+wisc.data <- wisc.df[,-1]
+wisc.data
+```
+
+```{r}
+# Create diagnosis vector for later 
+diagnosis <- as.factor(wisc.df$diagnosis)
+```
+
+
+```{r}
+# Q1. How many observations are in this dataset?
+nrow(wisc.df)
+
+```
+
+```{r}
+# Q2. How many of the observations have a malignant diagnosis?
+summary(diagnosis)
+
+```
+
+```{r}
+# Q3. How many variables/features in the data are suffixed with _mean?
+
+wiscogrep <-grep("_mean", colnames(wisc.df))
+length(wiscogrep)
+
+```
+
+
+```{r}
+# Check column means and standard deviations
+colMeans(wisc.data)
+
+apply(wisc.data,2,sd)
+```
+
+```{r}
+# Execute PCA, scaling if appropriate: wisc.pr
+wisc.pca<- prcomp(wisc.data, scale = T)
+
+summary(wisc.pca)
+```
+
+# Q4. From your results, what proportion of the original variance is captured by the first principal components (PC1)?
+  44.27% of the variance is captured by PC1
+
+
+# Q5. How many principal components (PCs) are required to describe at least 70% of the original variance in the data?
+  at least 3 PCs are required to explain 72.6% of the variance
+
+# Q6. How many principal components (PCs) are required to describe at least 90% of the original variance in the data?
+  at least 7 PCs are required to describe 91% of the variance in the data.
+
+
+```{r}
+biplot(wisc.pca)
+# Q7. What stands out to you about this plot? Is it easy or difficult to understand? Why?
+# this graph is very convoluted and busy which makes it hard to read and understand. 
+# A different plot would better suit this data.
+
+```
+
+
+```{r}
+# scatter plot to better observe the data. These two PCs account for 63% of the data.
+plot(wisc.pca$x, col = diagnosis, 
+     xlab = "PC1", ylab = "PC2")
+```
+
+
+```{r}
+# Q8. Generate a similar plot for principal components 1 and 3. What do you notice about these plots?
+# Since PC3 doesn't explain as much variance as PC2, the data shifted down the y axis, denoting less variance is explained by that PC. The data is split along the x-axis indicating that PC1 captures more of the variance in the data.
+
+plot(wisc.pca$x[ ,-2], col = diagnosis, 
+     xlab = "PC1", ylab = "PC3")
+```
+
+```{r}
+# Create a data.frame for ggplot
+df <- as.data.frame(wisc.pca$x)
+df$diagnosis <- diagnosis
+
+# Load the ggplot2 package
+library(ggplot2)
+
+# Make a scatter plot colored by diagnosis
+ggplot(df) + 
+  aes(PC1, PC2, col=diagnosis) + 
+  geom_point()
+```
+
+```{r}
+# Calculate variance of each component
+pr.var <- wisc.pca$sdev^2
+head(pr.var)
+```
+
+```{r}
+# Variance explained by each principal component: pve
+pve <- pr.var/sum(pr.var)
+
+# Plot variance explained for each principal component
+plot(pve, xlab = "Principal Component", 
+     ylab = "Proportion of Variance Explained", 
+     ylim = c(0, 1), type = "o")
+
+```
+
+```{r}
+# Alternative scree plot of the same data, note data driven y-axis
+barplot(pve, ylab = "Precent of Variance Explained",
+     names.arg=paste0("PC",1:length(pve)), las=2, axes = FALSE)
+axis(2, at=pve, labels=round(pve,2)*100 )
+```
+
+```{r}
+## ggplot based graph
+# install.packages("factoextra")
+library(factoextra)
+fviz_eig(wisc.pca, addlabels = TRUE)
+```
+
+# Q9. For the first principal component, what is the component of the loading vector (i.e. wisc.pr$rotation[,1]) for the feature concave.points_mean?
+
+
+# Q10. What is the minimum number of principal components required to explain 80% of the variance of the data?
+  The minimum PCs required to explain 80% of the variance is 5.
+
+
+## Hierarchical clustering
+
+```{r}
+# Scale the wisc.data data using the "scale()" function
+data.scaled <- scale(wisc.data)
+```
+
+```{r}
+# Hierarchical clustering
+wisc.hclust <- hclust(dist(data.scaled), method = "complete")
+```
+
+
+```{r}
+# Q11. Using the plot() and abline() functions, what is the height at which the clustering model has 4 clusters?
+# By placing the line at height 20, we now have 4 clusters
+plot(wisc.hclust)
+abline(wisc.hclust, h=20, col="red", lty=2)
+
+```
+
+```{r}
+wisc.hclust.clusters <- cutree(wisc.hclust, k=4)
+wisc.hclust.clusters
+```
+
+```{r}
+table(wisc.hclust.clusters, diagnosis)
+```
+
+# Q12. Can you find a better cluster vs diagnoses match by cutting into a different number of clusters between 2 and 10?
+  This method for finding the right delineation between disease state and healthy. Hclust is not the best way to start when visualizing this data.
+
+```{r}
+wisc.hclust.clusters2 <- cutree(wisc.hclust, k= 2)
+wisc.hclust.clusters3 <- cutree(wisc.hclust, k= 5)
+wisc.hclust.clusters4 <- cutree(wisc.hclust, k= 10)
+table(wisc.hclust.clusters2)
+table(wisc.hclust.clusters3)
+table(wisc.hclust.clusters4)
+```
+
+# Q13. Which method gives your favorite results for the same data.dist dataset? Explain your reasoning.
+
+```{r}
+
+```
+
+
+
+
 
