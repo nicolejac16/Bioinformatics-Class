@@ -198,6 +198,49 @@ table(wisc.hclust.clusters4)
 # Q13. Which method gives your favorite results for the same data.dist dataset? Explain your reasoning.
 
 ```{r}
+wisc.pca.hclust <- hclust(dist(data.scaled), method = "ward.D2")
+
+```
+
+
+```{r}
+grps <- cutree(wisc.pr.hclust, k=2)
+table(grps)
+
+```
+
+
+```{r}
+table(grps, diagnosis)
+```
+
+```{r}
+plot(wisc.pca$x[,1:2], col=grps)
+
+```
+
+```{r}
+plot(wisc.pca$x[,1:2], col=diagnosis)
+```
+
+```{r}
+wisc.pca.hclust.clusters <- cutree(wisc.pr.hclust, k=2)
+```
+
+# Q15. How well does the newly created model with four clusters separate out the two diagnoses?
+  Better than the original model but still doesn't separate disease state and healthy well.
+
+```{r}
+# Compare to actual diagnoses
+table(wisc.pca.hclust.clusters, diagnosis)
+
+```
+
+# Q16. How well do the k-means and hierarchical clustering models you created in previous sections (i.e. before PCA) do in terms of separating the diagnoses? Again, use the table() function to compare the output of each model (wisc.km$cluster and wisc.hclust.clusters) with the vector containing the actual diagnoses.
+
+```{r}
+table(___, diagnosis)
+table(___, diagnosis)
 
 ```
 
