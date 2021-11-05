@@ -1,12 +1,211 @@
 ---
-title: "Untitled"
+title: "Class 11 in class"
 output: github_document
 author: Nicole Jacobson A13081206
 ---
 
+```{r}
+
+pbd.data <- read.csv("DataExportSummary.csv")
+pbd.data
+```
 
 ```{r}
+# Q1: What percentage of structures in the PDB are solved by X-Ray and Electron Microscopy.
+xray.em <- ((sum(pbd.data$X.ray) + sum(pbd.data$EM)) / (sum(pbd.data$Total)) * 100)
+xray.em
 
 
 ```
+
+```{r}
+# Q2: What percent of structures in the PDB are protein?
+struc.prot <- ((pbd.data[1,8])) / (sum(pbd.data$Total)) * 100
+struc.prot
+```
+
+Q3: Type HIV in the PDB website search box on the home page and determine how many HIV-1 protease structures are in the current PDB?
+
+23409
+
+![](hivprot.png)
+
+Q4: Water molecules normally have 3 atoms. Why do we see just one atom per water molecule in this structure?
+
+The resolution of the structure is only 1.9 angstroms which makes the H atoms impossible to visualize
+
+Q5: There is a conserved water molecule in the binding site. Can you identify this water molecule? What residue number does this water molecule have (see note below)?
+
+OH308:0
+
+# Using bio3d in R for structural analysis
+
+```{r}
+library(bio3d)
+
+```
+
+```{r}
+pdb <- read.pdb("1hel")
+pdb
+```
+
+```{r}
+head(pdb$atom)
+```
+
+# Now let's look at protein dynamics (flexiblity). We will use nma function for this. Does a normal model analysis
+
+```{r}
+m <- nma(pdb)
+plot(m)
+```
+
+# Make a little movie (trajectory) for viewing in VMD.
+
+```{r}
+mktrj(m, file="nma.pdb")
+```
+
+
+Q7: How many amino acid residues are there in this pdb object?
+  
+  198
+  
+Q8: Name one of the two non-protein residues?
+
+  HOH
+  
+Q9: How many protein chains are in this structure?
+
+  2
+  
+
+```{r}
+attributes(pdb)
+```
+
+
+```{r}
+head(pdb$atom)
+
+```
+
+![](nma.png)
+
+Q10. Which of the packages above is found only on BioConductor and not CRAN? 
+ 
+  msa
+
+Q11. Which of the above packages is not found on BioConductor or CRAN?
+
+ bio3d-view 
+  
+Q12. True or False? Functions from the devtools package can be used to install packages from GitHub and BitBucket?
+
+  TRUE
+
+# Comparative strucutre analyiss
+  Start by getting a sequence of interest
+  
+```{r}
+library(bio3d)
+aa <- get.seq("1ake_A")
+aa
+```
+
+
+Q13. How many amino acids are in this sequence, i.e. how long is this sequence? 
+  
+  214
+  
+```{r}
+# Preforming a blast search here using a file from the structural database pdb. 
+blast <- blast.pdb(aa)
+
+```
+
+
+
+```{r}
+# Plot blast results
+hits <- plot(blast)
+```
+
+```{r}
+# Will give us the top blast hits by giving the ID of the top matching pdb results
+(hits$pdb.id)
+```
+
+```{r}
+hits <- NULL
+hits$pdb.id <- c('1AKE_A','4X8M_A','6S36_A','6RZE_A','4X8H_A','3HPR_A','1E4V_A','5EJE_A','1E4Y_A','3X2S_A','6HAP_A','6HAM_A','4K46_A','4NP6_A','3GMT_A','4PZL_A')
+```
+
+
+```{r}
+# here we download all the similar structural hits in the pdb and store them as a viarable files on our computer
+files <- get.pdb(hits$pdb.id, path="pdbs", split=TRUE, gzip=TRUE)
+```
+
+We now want to align all these structures. Will be using a function called pdbaln
+
+```{r}
+
+pdbs <- pdbaln(files, fit = TRUE)
+
+```
+
+```{r}
+pdbs
+```
+
+
+```{r}
+# Vector containing PDB codes for figure axis
+ids <- basename.pdb(pdbs$id)
+
+# Draw schematic alignment
+plot(pdbs, labels=ids)
+```
+
+Here we will do a PCA on the xyz cordinates data of all the structures that aligned with our search
+
+```{r}
+# Do a PCA!
+pctest <- pca(pdbs)
+plot(pctest)
+```
+
+Let's visualize the movements of the structures that are captured by PC1
+
+```{r}
+mktrj(pctest, pc=1, file="pca.pdb")
+```
+
+
+![](pca.png)
+
+Let's save our important results
+
+```{r}
+#save(blast, hits, pctest, file="myresults.RData")
+
+#load("myresults.RData")
+```
+
+
+
+```{r}
+# NMA of all structures
+modes <- nma(pdbs)
+```
+
+
+
+
+```{r}
+plot(modes, pdbs)
+```
+
 
