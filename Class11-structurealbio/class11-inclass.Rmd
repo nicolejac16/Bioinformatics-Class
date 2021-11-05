@@ -67,24 +67,21 @@ plot(m)
 mktrj(m, file="nma.pdb")
 ```
 
-
 Q7: How many amino acid residues are there in this pdb object?
-  
-  198
-  
+
+198
+
 Q8: Name one of the two non-protein residues?
 
-  HOH
-  
+HOH
+
 Q9: How many protein chains are in this structure?
 
-  2
-  
+2
 
 ```{r}
 attributes(pdb)
 ```
-
 
 ```{r}
 head(pdb$atom)
@@ -93,39 +90,37 @@ head(pdb$atom)
 
 ![](nma.png)
 
-Q10. Which of the packages above is found only on BioConductor and not CRAN? 
- 
-  msa
+Q10. Which of the packages above is found only on BioConductor and not CRAN?
+
+msa
 
 Q11. Which of the above packages is not found on BioConductor or CRAN?
 
- bio3d-view 
-  
+bio3d-view
+
 Q12. True or False? Functions from the devtools package can be used to install packages from GitHub and BitBucket?
 
-  TRUE
+TRUE
 
-# Comparative strucutre analyiss
-  Start by getting a sequence of interest
-  
+# Comparative structure analyis
+
+Start by getting a sequence of interest
+
 ```{r}
 library(bio3d)
 aa <- get.seq("1ake_A")
 aa
 ```
 
+Q13. How many amino acids are in this sequence, i.e. how long is this sequence?
 
-Q13. How many amino acids are in this sequence, i.e. how long is this sequence? 
-  
-  214
-  
+214
+
 ```{r}
 # Preforming a blast search here using a file from the structural database pdb. 
 blast <- blast.pdb(aa)
 
 ```
-
-
 
 ```{r}
 # Plot blast results
@@ -141,7 +136,6 @@ hits <- plot(blast)
 hits <- NULL
 hits$pdb.id <- c('1AKE_A','4X8M_A','6S36_A','6RZE_A','4X8H_A','3HPR_A','1E4V_A','5EJE_A','1E4Y_A','3X2S_A','6HAP_A','6HAM_A','4K46_A','4NP6_A','3GMT_A','4PZL_A')
 ```
-
 
 ```{r}
 # here we download all the similar structural hits in the pdb and store them as a viarable files on our computer
@@ -159,7 +153,6 @@ pdbs <- pdbaln(files, fit = TRUE)
 ```{r}
 pdbs
 ```
-
 
 ```{r}
 # Vector containing PDB codes for figure axis
@@ -183,7 +176,6 @@ Let's visualize the movements of the structures that are captured by PC1
 mktrj(pctest, pc=1, file="pca.pdb")
 ```
 
-
 ![](pca.png)
 
 Let's save our important results
@@ -194,18 +186,26 @@ Let's save our important results
 #load("myresults.RData")
 ```
 
-
-
 ```{r}
 # NMA of all structures
 modes <- nma(pdbs)
 ```
 
-
-
-
 ```{r}
 plot(modes, pdbs)
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
