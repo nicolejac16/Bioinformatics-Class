@@ -1,0 +1,275 @@
+---
+title: "class15inclass"
+author: "Nicole Jacobson"
+date: "11/17/2021"
+title: "Class 11 in class"
+output: pdf_document
+author: Nicole Jacobson A13081206
+date: 211117
+---
+
+```{r}
+library(BiocManager)
+library(DESeq2)
+
+```
+
+```{r}
+counts <- read.csv("airway_scaledcounts.csv", row.names=1)
+metadata <-  read.csv("airway_metadata.csv")
+```
+
+```{r}
+head(counts)
+```
+
+```{r}
+head(metadata)
+```
+
+Let's check the correspondence of the metadata and count data setup. 
+
+```{r}
+metadata$id
+```
+```{r}
+colnames(counts)
+```
+
+```{r}
+# we can use "==" to see if two arguments are equal
+metadata$id == colnames(counts)
+```
+
+```{r}
+all(metadata$id == colnames(counts))
+```
+
+# We want to start by comparing the contorl vs treated groups.
+  We will need to access all the control columns in the data.
+  
+```{r}
+control.inds <- metadata$dex == "control"
+control.ids <- metadata[control.inds,]$id
+```
+
+Will use these IDs to access just the control columns of our "count" data
+
+# Q2. How many ‘control’ cell lines do we have?
+4
+
+```{r}
+head(counts[,control.ids])
+```
+
+
+# Q1. How many genes are in this dataset?
+38694
+
+```{r}
+nrow(counts)
+```
+
+There are `r nrow(counts)` rows/genes in this dataset
+
+
+```{r}
+control.mean <- (rowMeans(counts[,control.ids]))
+head(control.mean)
+```
+Do the same for drug treated
+
+```{r}
+treated.inds <- metadata$dex == "treated"
+treated.ids <- metadata[treated.inds,]$id
+```
+
+```{r}
+head(counts[,treated.ids])
+```
+
+```{r}
+treated.mean <- (rowMeans(counts[,treated.ids]))
+head(treated.mean)
+```
+
+# Compare the control and treated with a quick plot of contorl vs. treated mean counts
+
+```{r}
+plot(control.mean, treated.mean)
+
+```
+
+We need to log transform this data!! log log scale
+
+```{r}
+plot(log="xy", treated.mean, control.mean)
+```
+
+```{r}
+log2(20/20)
+```
+
+```{r}
+log2(80/20)
+```
+
+```{r}
+meancounts <- data.frame(control.mean, treated.mean)
+```
+
+fc for fold change. This command will add another column called log2fc
+
+```{r}
+meancounts$log2fc <- log2(meancounts[,"treated.mean"]/meancounts[,"control.mean"])
+head(meancounts)
+```
+
+```{r}
+plot(meancounts$log2fc)
+```
+
+# Now we want to drop all the 0.00 counts
+
+```{r}
+head(meancounts[,1:2])
+```
+
+```{r}
+head(meancounts[,1:2]==0)
+```
+
+The `which()` function tells us the TRUE results in a logical vector.
+
+  But, it's not that helpful since it just gives us the coorinate of the column we're looking for. 
+  
+```{r}
+head(which(meancounts[,1:2]==0))
+```
+
+Now we can try and exclude the zeros. Here we only care about the rows (if there is a zero in any column we want to exclude it)
+```{r}
+inds <- which(meancounts[,1:2] ==0, arr.ind=TRUE)
+head(inds)
+```
+
+```{r}
+# these are the rows I want to remove
+to.rm <- unique((inds[,"row"]))
+```
+
+
+```{r}
+mycounts <- (meancounts[-to.rm,])
+```
+
+Now we have `r nrow(mycounts)` genes left
+
+```{r}
+nrow(mycounts)
+```
+
+Now we are interested in how many genes are up/down regulated at the log2 fold change level.
+
+```{r}
+# this is how many genes are unregulated
+sum(mycounts$log2fc > +2)
+
+```
+what percent is this of the total genes?
+
+```{r}
+# this will give us what percent are upregulated. 1.15% are upregulated
+(sum(mycounts$log2fc > +2) / (nrow(mycounts)))*100
+```
+
+```{r}
+# this will give us what percent of the genes are downregulated. 1.68%
+(sum(mycounts$log2fc < -2) / (nrow(mycounts)))*100
+```
+
+```{r}
+library(DESeq2)
+citation("DESeq2")
+```
+# we first need to setup the DESeq input dataset.
+
+```{r}
+dds <- DESeqDataSetFromMatrix(countData=counts, 
+                              colData=metadata, 
+                              design=~dex)
+dds
+```
+# run the DESeq analysis pipeline
+
+```{r}
+dds <- DESeq(dds)
+```
+
+
+```{r}
+res <- results(dds)
+head(res)
+```
+
+
+# let's start with a volcano plot. 
+
+  This is a very common data visualization for this kind of data.
+
+
+```{r}
+plot(res$log2FoldChange, -log(res$padj))
+abline(v=c(-2,2), col="green")
+abline(h=-log(0.05), col="purple")
+
+```
+
+
+# Adding annotation data
+
+  We want to add meaningful gene names to our dataset so we can make some sense fo what is going on.
+  
+  For this we will use two bioconductor packages, one does the work and is called annotationdbi and the other contains data we are going to map and     it's called org.hs.eg.db
+
+```{r}
+# BiocManager::install("AnnotationDbi")
+```
+
+```{r}
+# BiocManager::install("org.Hs.eg.db")
+```
+
+
+```{r}
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+```
+
+
+```{r}
+columns(org.Hs.eg.db)
+```
+
+Here we map to "SYMBOL" the common gene name that the world understands
+
+```{r}
+res$symbol <- mapIds(org.Hs.eg.db,
+                     keys=row.names(res), # Our genenames
+                     keytype="ENSEMBL",        # The format of our genenames
+                     column="SYMBOL",          # The new format we want to add
+                     multiVals="first")
+head(res$symbol)
+
+```
+
+```{r}
+head(res)
+```
+
+
+
+
+
+
+
