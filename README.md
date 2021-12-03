@@ -7,7 +7,7 @@ Bioinformatics class at UCSD Bggn213
 - 04 Intro to R 
 - 05 Data visualization [source](https://github.com/nicolejac16/Bioinformatics-Class/tree/main/class05%20copy)
 - 06 R Functions [source](https://github.com/nicolejac16/Bioinformatics-Class/tree/main/Class06)
-- 07
+- 07 PCA [source](https://github.com/nicolejac16/Bioinformatics-Class/tree/main/Class7_PCA)
 - 08
 - 09 Halloween Candy analysis
 - 
