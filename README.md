@@ -9,5 +9,5 @@ Bioinformatics class at UCSD Bggn213
 - 06 R Functions [source](https://github.com/nicolejac16/Bioinformatics-Class/tree/main/Class06)
 - 07 PCA [source](https://github.com/nicolejac16/Bioinformatics-Class/tree/main/Class7_PCA)
 - 08
-- 09 Halloween Candy analysis
+- 09 Halloween Candy analysis [source](https://github.com/nicolejac16/Bioinformatics-Class/tree/main/Class09)
 - 
