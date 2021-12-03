@@ -10,4 +10,5 @@ Bioinformatics class at UCSD Bggn213
 - 07 PCA [source](https://github.com/nicolejac16/Bioinformatics-Class/tree/main/Class7_PCA)
 - 08
 - 09 Halloween Candy analysis [source](https://github.com/nicolejac16/Bioinformatics-Class/tree/main/Class09)
-- 
+- 10 
+- 11 Structural Biology [source](https://github.com/nicolejac16/Bioinformatics-Class/tree/main/Class11-structurealbio)
